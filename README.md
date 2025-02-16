@@ -1,2 +1,3 @@
 # Scripts
-各种脚本
+
+* [uaa_novel_downloader](./uaa_novel_downloader/README.md) 是一个用于从指定网站下载小说的 Python 脚本。
