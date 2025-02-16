@@ -3,6 +3,7 @@ from bs4 import BeautifulSoup
 from pathlib import Path
 import sys
 import os
+import time
 
 class NovelDownloader:
     # UAA 发布地址：https://uaadizhi.com/
@@ -145,6 +146,8 @@ class NovelDownloader:
                     if content:
                         f.write(f"\n{chapter_title}\n\n{content}\n\n")
                         print(f"已下载: [{current_chapter}/{end_chapter}] {chapter_title}")
+                        if current_chapter < end_chapter:
+                            time.sleep(5) # 等待 5s 防止请求过快被封 IP
                     current_chapter += 1
 
                 if current_chapter > end_chapter:
