@@ -154,7 +154,7 @@ class NovelDownloader:
 
         # 记录下载进度
         with open(next_file, 'a', encoding='utf-8') as f:
-            f.write(f"{end_chapter + 1} 《{title}》\n")
+            f.write(f"{end_chapter + 1}  《{title}》  {self.novel_id}\n")
 
 def main():
     try:
