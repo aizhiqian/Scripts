@@ -154,7 +154,8 @@ class NovelDownloader:
 
         # 记录下载进度
         with open(next_file, 'a', encoding='utf-8') as f:
-            f.write(f"{end_chapter + 1}  《{title}》  {self.novel_id}\n")
+            progress_line = f"{str(end_chapter + 1):<8s}{str(self.novel_id):<22s}《{title}》\n"
+            f.write(progress_line)
 
 def main():
     try:
