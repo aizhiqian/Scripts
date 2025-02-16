@@ -33,3 +33,55 @@
 - requests
 - BeautifulSoup4
 
+## API 参数
+```
+https://www.uaa001.com/api/novel/app/novel/search?author=&category=&finished=&excludeTags=&space=&searchType=1&orderType=2&page=1&size=48
+```
+
+```
+排序 orderType
++: 降序 -: 升序
+±1: 上架
+±2: 更新
+±3: 观看
+±4: 收藏
+±5: 评分
+±6: 肉量
+
+来源 source
+1: 原创首发
+2: 会员上传
+
+长度 space
+1: 短篇（小于10万字）
+2: 中篇（10-100万字）
+3: 长篇（大于100万字）
+
+评分 score
+1: >1
+2: >2
+3: >3
+4: >4
+
+状态 finished
+0: 连载中
+1: 已完结
+
+人称视角 person
+1: 男性视角
+2: 女性视角
+3: 第二人称
+4: 第三人称
+
+肉量 porn
+1: 少肉
+2: 中肉
+3: 多肉
+4: 超多肉
+
+取向 orientation
+1: 直男文
+2: 女主文
+3: 男男文
+4: 女女文
+```
