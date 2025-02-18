@@ -33,6 +33,20 @@
 - requests
 - BeautifulSoup4
 
+## 手动提取
+> 提取所有 `.line div` 中的文本，并按顺序拼接
+- 打开小说文章页
+- 使用 `F12` 或右键菜单打开浏览器开发者工具
+- 切换到 `Console` 标签页
+- 粘贴代码并回车执行
+
+```
+let text = Array.from(document.querySelectorAll('.line'))
+             .map(div => div.textContent.trim())
+             .join('\n');
+console.log(text);
+```
+
 ## API 参数
 ```
 https://www.uaa001.com/api/novel/app/novel/search?author=&category=&finished=&excludeTags=&space=&searchType=1&orderType=2&page=1&size=48
@@ -84,4 +98,5 @@ https://www.uaa001.com/api/novel/app/novel/search?author=&category=&finished=&ex
 2: 女主文
 3: 男男文
 4: 女女文
+
 ```
