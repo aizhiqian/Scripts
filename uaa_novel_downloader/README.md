@@ -34,17 +34,52 @@
 - BeautifulSoup4
 
 ## 手动提取
-> 提取所有 `.line div` 中的文本，并按顺序拼接
+输出格式为：
+```
+章节名
+
+章节内容(自动换行)
+
+
+```
 - 打开小说文章页
 - 使用 `F12` 或右键菜单打开浏览器开发者工具
 - 切换到 `Console` 标签页
-- 粘贴代码并回车执行
+- 粘贴以下代码并回车执行
+- 自动复制到剪贴板
 
 ```
-let text = Array.from(document.querySelectorAll('.line'))
-             .map(div => div.textContent.trim())
-             .join('\n');
-console.log(text);
+function extractChapterContent() {
+    // 提取章节标题
+    const chapterTitle = document.querySelector('h2').innerText;
+
+    // 提取所有line div中的文本
+    const lines = Array.from(document.querySelectorAll('.line')).map(line => line.innerText.trim());
+    const content = lines.join('\n');
+
+    // 按指定格式组织内容
+    const output = `${chapterTitle}\n\n${content}\n\n\n`;
+
+    const textArea = document.createElement('textarea');
+    textArea.value = output;
+    document.body.appendChild(textArea);
+
+    // 在控制台显示内容
+    console.log(output);
+
+    textArea.select();
+    try {
+        document.execCommand('copy');
+        console.log('内容已复制到剪贴板');
+    } catch (err) {
+        console.error('复制失败:', err);
+    }
+
+    document.body.removeChild(textArea);
+}
+
+extractChapterContent()
+
 ```
 
 ## API 参数
