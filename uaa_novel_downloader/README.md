@@ -53,21 +53,22 @@ function extractChapterContent() {
     // 提取章节标题
     const rawTitle = document.querySelector('h2').innerText;
 
-    // 根据不同HTML处理标题
-    let chapterTitle;
-    if (rawTitle.includes('卷')) {
-        // 处理包含卷名的情况，只保留章节部分
-        const parts = rawTitle.split('&nbsp;');
-        chapterTitle = parts.length > 1 ? parts[1] : rawTitle;
-    } else {
-        // 直接使用标题
-        chapterTitle = rawTitle;
-    }
+    // 清理标题格式
+    let chapterTitle = rawTitle
+        .split('&nbsp;')
+        .pop() // 获取最后一部分（章节名）
+        .replace(/^第.+卷\s*/, '') // 移除开头的卷名
+        .replace(/^\s+|\s+$/g, ''); // 移除首尾空格
 
     // 提取所有非空的line div文本
-    const lines = Array.from(document.querySelectorAll('.line'))
-        .map(line => line.innerText.trim())
-        .filter(text => text); // 过滤空行
+    const lines = Array.from(document.querySelectorAll('.article .line'))
+        .map(line => {
+            // 获取直接文本内容，移除子元素
+            const clone = line.cloneNode(true);
+            Array.from(clone.getElementsByTagName('span')).forEach(span => span.remove());
+            return clone.textContent.trim();
+        })
+        .filter(text => text.length > 0);  // 过滤空行
 
     // 组合成指定格式
     const content = lines.join('\n');
@@ -81,7 +82,7 @@ function extractChapterContent() {
     // 在控制台显示内容
     console.log(output);
 
-    // 自动复制到剪贴板
+    // 复制到剪贴板
     textArea.select();
     try {
         document.execCommand('copy');
@@ -94,7 +95,6 @@ function extractChapterContent() {
 }
 
 extractChapterContent();
-
 ```
 
 ## API 参数
