@@ -48,18 +48,32 @@
 - 粘贴以下代码并回车执行
 - 自动复制到剪贴板
 
-```
+```js
 function extractChapterContent() {
     // 提取章节标题
-    const chapterTitle = document.querySelector('h2').innerText;
+    const rawTitle = document.querySelector('h2').innerText;
 
-    // 提取所有line div中的文本
-    const lines = Array.from(document.querySelectorAll('.line')).map(line => line.innerText.trim());
+    // 根据不同HTML处理标题
+    let chapterTitle;
+    if (rawTitle.includes('卷')) {
+        // 处理包含卷名的情况，只保留章节部分
+        const parts = rawTitle.split('&nbsp;');
+        chapterTitle = parts.length > 1 ? parts[1] : rawTitle;
+    } else {
+        // 直接使用标题
+        chapterTitle = rawTitle;
+    }
+
+    // 提取所有非空的line div文本
+    const lines = Array.from(document.querySelectorAll('.line'))
+        .map(line => line.innerText.trim())
+        .filter(text => text); // 过滤空行
+
+    // 组合成指定格式
     const content = lines.join('\n');
-
-    // 按指定格式组织内容
     const output = `${chapterTitle}\n\n${content}\n\n\n`;
 
+    // 创建临时textarea用于复制
     const textArea = document.createElement('textarea');
     textArea.value = output;
     document.body.appendChild(textArea);
@@ -67,6 +81,7 @@ function extractChapterContent() {
     // 在控制台显示内容
     console.log(output);
 
+    // 自动复制到剪贴板
     textArea.select();
     try {
         document.execCommand('copy');
@@ -78,7 +93,7 @@ function extractChapterContent() {
     document.body.removeChild(textArea);
 }
 
-extractChapterContent()
+extractChapterContent();
 
 ```
 
