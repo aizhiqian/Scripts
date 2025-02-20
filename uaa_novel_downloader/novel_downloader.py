@@ -10,44 +10,8 @@ class NovelDownloader:
     BASE_URL = "https://www.uaa001.com"
     HEADERS = {
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/133.0.0.0 Safari/537.36',
-        # penajay922@acname.com
-        # 'Cookie': 'token=eyJhbGciOiJIUzI1NiJ9.eyJpZCI6OTc5MDI1ODkwMjMzMTU5NjgwLCJ0eXBlIjoiY3VzdG9tZXIiLCJ0aW1lc3RhbXAiOjE3Mzk5NTA0ODQ1ODcsImV4cCI6MTc0MDU1NTI4NH0.0fLzLIWx8EAWkgywEvrEs5EkLqn9bxZ6t_qwcGbDJtM; JSESSIONID=837784F89E8D22A0E27FEA0AC0478324'
-
-        # se.fen.h.a.re@gmail.com
-        # 'Cookie': 'token=eyJhbGciOiJIUzI1NiJ9.eyJpZCI6MTA4ODI1ODAyODI0NDk2MzMyOCwidHlwZSI6ImN1c3RvbWVyIiwidGltZXN0YW1wIjoxNzM5OTUxNDM3ODM5LCJleHAiOjE3NDA1NTYyMzd9.-mgkxByK1C4i1hr6XYeh40Z5ikywiI8Au9_Klv5Kni8; JSESSIONID=1B198422A2155D0720A82FF99BDA6FF5'
-
-        # jb.urkce.c3l@gmail.com
-        # 'Cookie': 'token=eyJhbGciOiJIUzI1NiJ9.eyJpZCI6MTA4ODI2NDY3MDg5MDAzNzI0OCwidHlwZSI6ImN1c3RvbWVyIiwidGltZXN0YW1wIjoxNzM5OTUxNTQ4NTA5LCJleHAiOjE3NDA1NTYzNDh9.kqkVeoSYPcSHpiNyRFo2uX5MNn3cY5Grzvvg13pWnlU; JSESSIONID=F4B481E22525FAE930DD7744E896730B'
-
-        # n.a.rratorx.c.b@gmail.com
-        # 'Cookie': 'token=eyJhbGciOiJIUzI1NiJ9.eyJpZCI6MTA4ODI2ODcyNDEwMTg0NDk5MiwidHlwZSI6ImN1c3RvbWVyIiwidGltZXN0YW1wIjoxNzM5OTUxNjM5MjY5LCJleHAiOjE3NDA1NTY0Mzl9.lBgtLQNJ0A62ITCmeJOpD4KlNZRBtT5tUJ8VCyvzYR0; JSESSIONID=BDD1AF1365CFF1C2ACC0F9118F2DA507'
-
-        # bsosbc.s.hs@gmail.com
-        # 'Cookie': 'token=eyJhbGciOiJIUzI1NiJ9.eyJpZCI6MTA4ODI3MDE1MTQ5ODk5MzY2NCwidHlwZSI6ImN1c3RvbWVyIiwidGltZXN0YW1wIjoxNzM5OTUxNzA0ODM5LCJleHAiOjE3NDA1NTY1MDR9.M5jwMJV-gfuF6Z9hvPh5je4SyJ_duCm7Q_y99P_0o_w; JSESSIONID=86F9DAB0CDA3634D85B71F5492F63015'
-
-        # p.ar.t.on.globa@gmail.com
-        # 'Cookie': 'token=eyJhbGciOiJIUzI1NiJ9.eyJpZCI6MTA4ODYwODU1MTMzODkwNTYwMCwidHlwZSI6ImN1c3RvbWVyIiwidGltZXN0YW1wIjoxNzM5OTUxNzY4NTY2LCJleHAiOjE3NDA1NTY1Njh9.jAxzGOc-sGQa9DHbBDY41MBJiYprjE1iGNf329Dh2Co; JSESSIONID=04CDB03D3DF0BEECCC4F2FC3D2A311A0'
-
-        # c.hlo.ese.ri.da.re@gmail.com
-        # 'Cookie': 'token=eyJhbGciOiJIUzI1NiJ9.eyJpZCI6MTA4ODYxMDI1MzExNDgzOTA0MCwidHlwZSI6ImN1c3RvbWVyIiwidGltZXN0YW1wIjoxNzM5OTQ3MDIzMTU5LCJleHAiOjE3NDA1NTE4MjN9.8D-1Gtzv33ixTgt-YyR1wqHjiTREFSeGAUEsXi2AmnU; JSESSIONID=EBEA8EA13BDBE70D740BAA2F3B8938F6'
-
-        # br.yce.ra.n.dr.a.5.8@gmail.com
-        'Cookie': 'token=eyJhbGciOiJIUzI1NiJ9.eyJpZCI6MTA4ODYxMjMwOTE4MzYzMTM2MCwidHlwZSI6ImN1c3RvbWVyIiwidGltZXN0YW1wIjoxNzM5ODUwMzUwMzU2LCJleHAiOjE3NDA0NTUxNTB9.bcaJAt4YbDiUWSGr8rLX3IAo3pYSW8qXXQxmulDh3wQ; JSESSIONID=485D7A2A10CB211334E280245FF74091'
-
-        # b.a.r.ma.nh.ailey@gmail.com
-        # 'Cookie': 'token=eyJhbGciOiJIUzI1NiJ9.eyJpZCI6MTA4ODYxNDUyOTg1MzY4OTg1NiwidHlwZSI6ImN1c3RvbWVyIiwidGltZXN0YW1wIjoxNzM5ODUwNDExMzM1LCJleHAiOjE3NDA0NTUyMTF9.cRKTLqdY4UvuPfKQ7dvQmdEmSJbtqhp8eE_MLvpLz2Q; JSESSIONID=FAC4251B008882D6DD8F929B22ADBC03'
-
-        # p.s.y.cheb.el.ona@gmail.com
-        # 'Cookie': 'token=eyJhbGciOiJIUzI1NiJ9.eyJpZCI6MTA4ODYxNTYwODQyNzM1MjA2NCwidHlwZSI6ImN1c3RvbWVyIiwidGltZXN0YW1wIjoxNzM5ODUwNDcyMzY5LCJleHAiOjE3NDA0NTUyNzJ9.nPmwMI3HDqoor4Qcok-v6Z8Sc2njhfBd78Wcaj-WQEI; JSESSIONID=8B2B1997DAC68D0C9A6ADF8414844C37'
-
-        # abay.edris@gmail.com
-        # 'Cookie': 'token=eyJhbGciOiJIUzI1NiJ9.eyJpZCI6MTA4OTIxNzQ4ODQ5MjgyNjYyNCwidHlwZSI6ImN1c3RvbWVyIiwidGltZXN0YW1wIjoxNzM5ODU2MjI3MjYwLCJleHAiOjE3NDA0NjEwMjd9.doy6SLL_aC_3OV5CdlqL0go0Z1ZH-c7n6ZPgeP8Q4-o; JSESSIONID=FF50C01384FC18D081420662DE081B7B'
-
-        # b.sosbcshs@gmail.com
-        # 'Cookie': 'token=eyJhbGciOiJIUzI1NiJ9.eyJpZCI6MTA4OTIyMDMyMjI1MjY4OTQwOCwidHlwZSI6ImN1c3RvbWVyIiwidGltZXN0YW1wIjoxNzM5ODU2OTM4ODkwLCJleHAiOjE3NDA0NjE3Mzh9.TMjhRlUWwNVIdkVsvqgvpMSBbWCYlIAu3ndNYMWxyLI; JSESSIONID=C5AA693CADCF2B4E5ECB894AC4A34773'
-
-        # sbsbvv.wjshskb@gmail.com
-        # 'Cookie': 'token=eyJhbGciOiJIUzI1NiJ9.eyJpZCI6MTA4OTIyMjUwNzg4NzcyNjU5MiwidHlwZSI6ImN1c3RvbWVyIiwidGltZXN0YW1wIjoxNzM5ODU3Mzk5Nzg2LCJleHAiOjE3NDA0NjIxOTl9.2CpTSpyxmipkx0k5XWV7FqxzD_prtfMgIWoIInsh7vg; JSESSIONID=A9F2095F52881CC6D32DEFB1DA4C1892'
+        # 请添加你登陆后的 Cookie
+        'Cookie': ''
     }
     SAVE_DIR = Path(os.path.dirname(os.path.abspath(__file__))) # 保存到当前脚本所在位置
 
@@ -216,7 +180,7 @@ def main():
                 print("错误: 起始章节必须是整数")
                 return
 
-        chapter_count = input("请输入要下载的章节数量 (默认下载到最后): ").strip()
+        chapter_count = input("请输入下载数量 (默认下载到最后): ").strip()
         if chapter_count:
             try:
                 chapter_count = int(chapter_count)
