@@ -75,6 +75,35 @@ class ProgressManager:
         self.logger.info("清除所有进度")
         return True
 
+    def _str_display_width(self, text):
+        """计算字符串显示宽度（中文字符计为2，其他字符计为1）"""
+        width = 0
+        for char in text:
+            # 中文字符（包括中文标点）的Unicode范围
+            if '\u4e00' <= char <= '\u9fff' or '\u3000' <= char <= '\u303f' or '\uff00' <= char <= '\uffef':
+                width += 2
+            else:
+                width += 1
+        return width
+
+    def _truncate_text(self, text, max_width):
+        """截断文本，确保显示宽度不超过max_width"""
+        width = 0
+        for i, char in enumerate(text):
+            char_width = 2 if '\u4e00' <= char <= '\u9fff' or '\u3000' <= char <= '\u303f' or '\uff00' <= char <= '\uffef' else 1
+            width += char_width
+            if width > max_width:
+                return text[:i] + "..." if i > 0 else "..."
+        return text
+
+    def _pad_text(self, text, width):
+        """根据显示宽度对文本进行填充对齐"""
+        display_width = self._str_display_width(text)
+        padding = width - display_width
+        if padding > 0:
+            return text + " " * padding
+        return text
+
     def view_progress(self):
         """查看所有进度"""
         progress_data = self.load_progress()
@@ -85,12 +114,25 @@ class ProgressManager:
 
         print("\n📊 下载进度列表：")
         print("=" * 80)
-        print(f"{'小说ID':<26} {'书名':<30} {'进度':<12} {'百分比':<8}")
+
+        header_id = self._pad_text("小说ID", 26)
+        header_title = self._pad_text("书名", 30)
+        header_progress = self._pad_text("进度", 15)
+        header_percentage = self._pad_text("百分比", 8)
+
+        print(f"{header_id} {header_title} {header_progress} {header_percentage}")
         print("-" * 80)
 
         for novel_id, info in progress_data.items():
-            title = info['title'] if len(info['title']) <= 28 else info['title'][:25] + "..."
-            print(f"{novel_id:<26} {title:<30} {info['progress']:<12} {info['percentage']:>6}%")
+            title = info['title'] if self._str_display_width(info['title']) <= 28 else self._truncate_text(info['title'], 25)
+
+            padded_id = self._pad_text(novel_id, 26)
+            padded_title = self._pad_text(title, 30)
+            padded_progress = self._pad_text(info['progress'], 15)
+            percentage_str = f"{info['percentage']}%"
+            padded_percentage = self._pad_text(percentage_str, 8)
+
+            print(f"{padded_id} {padded_title} {padded_progress} {padded_percentage}")
 
         print("=" * 80)
 

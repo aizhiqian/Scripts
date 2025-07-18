@@ -1,6 +1,14 @@
+.idea/
+.venv/
+.wdm/
+build/
 config/
 data/
+dist/
 logs/
 output/
 src/__pycache__/
-venv/
+__pycache__/
+.DS_Store
+Thumbs.db
+*.spec

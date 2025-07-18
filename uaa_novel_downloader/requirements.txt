@@ -1,4 +1,10 @@
-selenium
-requests
+# UAA小说下载器依赖包
+
+# 核心依赖
 beautifulsoup4
-argparse
+requests
+selenium==4.34.2
+webdriver-manager==4.0.2
+
+# 打包工具
+pyinstaller

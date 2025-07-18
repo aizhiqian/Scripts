@@ -2,6 +2,9 @@ import json
 import re
 import sys
 import time
+import os
+import shutil
+import logging
 from datetime import datetime, timedelta
 from pathlib import Path
 from selenium import webdriver
@@ -11,6 +14,7 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.chrome.service import Service
 from selenium.common.exceptions import WebDriverException, TimeoutException
+from webdriver_manager.chrome import ChromeDriverManager
 from .config import Config
 from .logger import setup_logger
 
@@ -54,6 +58,41 @@ class AuthManager:
         except Exception as e:
             self.logger.exception(f"读取用户文件时出错: {str(e)}")
             return []
+
+    def _get_chromedriver_path(self):
+        """获取ChromeDriver路径，自动下载和管理"""
+        self.logger.info("开始获取ChromeDriver...")
+        print("🔄 正在检查/下载ChromeDriver...")
+
+        try:
+            # 确保目录存在
+            Config.WEBDRIVER_CACHE_DIR.mkdir(parents=True, exist_ok=True)
+
+            # 使用webdriver_manager自动管理ChromeDriver
+            self.logger.info("使用webdriver_manager自动管理ChromeDriver")
+
+            # 设置webdriver_manager的缓存目录为项目目录
+            os.environ['WDM_LOCAL'] = '1'  # 启用本地缓存
+            os.environ['WDM_LOG'] = str(logging.NOTSET)  # 减少日志输出
+
+            # 下载/获取ChromeDriver
+            chromedriver_path = ChromeDriverManager().install()
+            self.logger.info(f"ChromeDriver下载成功: {chromedriver_path}")
+            print(f"✅ ChromeDriver下载成功: {chromedriver_path}")
+
+            return chromedriver_path
+
+        except Exception as e:
+            self.logger.warning(f"webdriver_manager失败: {str(e)}")
+            print(f"⚠️ 自动下载ChromeDriver失败: {str(e)}")
+
+            # 下载失败
+            self.logger.error("无法获取ChromeDriver")
+            print("❌ 错误: 无法获取ChromeDriver，请尝试以下解决方案：")
+            print("  1. 检查网络连接")
+            print("  2. 确保Chrome浏览器已正确安装")
+            print("  3. 检查防火墙设置")
+            sys.exit(1)
 
     def login(self, user_id=None):
         """登录并获取Cookie"""
@@ -107,14 +146,11 @@ class AuthManager:
         chrome_options.add_experimental_option('useAutomationExtension', False)
         chrome_options.set_capability('acceptInsecureCerts', True)
 
-        try:
-            # 检查ChromeDriver是否存在
-            if not Config.CHROMEDRIVER_PATH.exists():
-                self.logger.error("ChromeDriver不存在")
-                print(f"❌ 错误: ChromeDriver不存在，请下载与Chrome版本匹配的驱动并放置于{Config.ROOT_DIR}目录下")
-                sys.exit(1)
+        # 获取ChromeDriver路径
+        chromedriver_path = self._get_chromedriver_path()
 
-            service = Service(executable_path=Config.CHROMEDRIVER_PATH)
+        try:
+            service = Service(executable_path=chromedriver_path)
 
             # 启动浏览器
             driver = webdriver.Chrome(service=service, options=chrome_options)
@@ -191,9 +227,8 @@ class AuthManager:
             print(f"\n❌ 启动浏览器时出错: {str(e)}")
             print("\n❌ 错误: 无法启动浏览器，请确认：")
             print("  1. Chrome 浏览器已正确安装")
-            print("  2. ChromeDriver 版本与 Chrome 浏览器版本匹配")
-            print("  3. ChromeDriver 已放置在项目根目录下")
-            print("  4. 网络连接正常")
+            print("  2. 网络连接正常（用于下载ChromeDriver）")
+            print("  3. 系统防火墙或杀毒软件未阻止程序运行")
             sys.exit(1)
 
     def get_cookie(self):

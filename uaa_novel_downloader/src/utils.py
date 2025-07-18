@@ -44,6 +44,105 @@ class ChapterModifier:
             print(f"❌ 修改章节编号失败: {str(e)}")
             return False
 
+    def modify_chapters_by_name(self, filepath, start_chapter_name, end_chapter_name, increment):
+        """通过章节名修改章节编号"""
+        try:
+            self.logger.info(f"开始按章节名修改: {filepath}, 开始: {start_chapter_name}, 结束: {end_chapter_name}, 增量: {increment}")
+
+            # 读取文件内容
+            with open(filepath, 'r', encoding='utf-8') as f:
+                content = f.read()
+
+            # 查找所有章节并记录其位置、编号和名称
+            chapter_pattern = r'第(\d+)章\s+(.+?)(?=\n|$)'
+            chapters = []
+
+            for match in re.finditer(chapter_pattern, content):
+                chapters.append({
+                    'start': match.start(),
+                    'end': match.end(),
+                    'num': int(match.group(1)),
+                    'name': match.group(2).strip(),
+                    'full_match': match.group(0)
+                })
+
+            if not chapters:
+                print("❌ 文件中未找到章节格式")
+                return False
+
+            # 查找开始和结束章节的位置索引（按文档顺序）
+            start_index = None
+            end_index = None
+
+            clean_start = re.sub(r'[^\w\u4e00-\u9fff]', '', start_chapter_name)
+            clean_end = re.sub(r'[^\w\u4e00-\u9fff]', '', end_chapter_name)
+
+            for i, chapter in enumerate(chapters):
+                clean_name = re.sub(r'[^\w\u4e00-\u9fff]', '', chapter['name'])
+
+                if clean_name == clean_start and start_index is None:
+                    start_index = i
+                    print(f"\n🔍 找到开始章节: 第{chapter['num']}章 {chapter['name']} (位置: {i+1})")
+
+                if clean_name == clean_end:
+                    end_index = i
+                    print(f"🔍 找到结束章节: 第{chapter['num']}章 {chapter['name']} (位置: {i+1})")
+
+            # 验证找到的章节
+            if start_index is None:
+                print(f"❌ 未找到包含\"{start_chapter_name}\"的章节")
+                return False
+
+            if end_index is None:
+                print(f"❌ 未找到包含\"{end_chapter_name}\"的章节")
+                return False
+
+            if start_index > end_index:
+                print("❌ 开始章节在文档中的位置不能晚于结束章节")
+                return False
+
+            # 确定要修改的章节范围（按文档位置）
+            chapters_to_modify = chapters[start_index:end_index+1]
+            print(f"📝 将修改从位置 {start_index+1} 到位置 {end_index+1} 的章节，共 {len(chapters_to_modify)} 章")
+
+            # 显示将要修改的章节
+            print("\n📖 将要修改的章节：")
+            for i, chapter in enumerate(chapters_to_modify):
+                new_num = chapter['num'] + increment
+                print(f"  第{chapter['num']}章 → 第{new_num}章 {chapter['name']}")
+
+            # 询问用户是否确认修改
+            operation = "增加" if increment > 0 else "减少"
+            confirm = input(f"\n✏️ 确认{operation}{abs(increment)}个章节编号？(y/n): ").strip().lower()
+
+            if confirm != 'y':
+                print("❌ 已取消修改操作")
+                return False
+
+            # 从后往前替换，避免位置偏移问题
+            modified_content = content
+            for chapter in reversed(chapters_to_modify):
+                new_num = chapter['num'] + increment
+                new_chapter_text = f"第{new_num}章 {chapter['name']}"
+                modified_content = (
+                    modified_content[:chapter['start']] +
+                    new_chapter_text +
+                    modified_content[chapter['end']:]
+                )
+
+            # 写回文件
+            with open(filepath, 'w', encoding='utf-8') as f:
+                f.write(modified_content)
+
+            print(f"\n✅ 已成功将指定范围内的 {len(chapters_to_modify)} 个章节编号{operation}{abs(increment)}。")
+            self.logger.info(f"按章节名修改完成: {filepath}")
+            return True
+
+        except Exception as e:
+            self.logger.exception(f"按章节名修改失败: {str(e)}")
+            print(f"❌ 按章节名修改失败: {str(e)}")
+            return False
+
     def interactive_modify(self):
         """交互式修改章节编号"""
         width = 80
@@ -59,9 +158,9 @@ class ChapterModifier:
             print("❌ 没有找到小说文件，请先下载小说")
             return
 
-        print("0. 取消并退出")
         for i, novel in enumerate(novels):
             print(f"{i+1}. {novel.name}")
+        print("0. 取消并退出")
 
         # 选择文件
         while True:
@@ -83,21 +182,53 @@ class ChapterModifier:
             except ValueError:
                 print("❌ 请输入数字")
 
-        # 输入参数
+        # 选择修改模式
+        print("\n📝 请选择修改模式：")
+        print("  1. 按章节编号修改")
+        print("  2. 按章节名称修改（推荐）")
+        print("  0. 返回上级菜单")
+
         try:
-            start_chapter = int(input("✏️ 请输入开始章节数: "))
-            end_chapter = int(input("✏️ 请输入结束章节数: "))
-            increment = int(input("✏️ 请输入章节修改值(+/-数字): "))
+            mode_choice = input("\n✏️ 请选择模式 (0-2): ").strip()
 
-            if start_chapter > end_chapter:
-                print("❌ 开始章节不能大于结束章节!")
+            if mode_choice == '0':
+                print("✅ 已取消操作")
                 return
+            elif mode_choice == '1':
+                # 按编号修改
+                start_chapter = int(input("✏️ 请输入开始章节数: "))
+                end_chapter = int(input("✏️ 请输入结束章节数: "))
+                increment = int(input("✏️ 请输入章节修改值(+/-数字): "))
 
-            self.modify_chapters(filepath, start_chapter, end_chapter, increment)
+                if start_chapter > end_chapter:
+                    print("❌ 开始章节不能大于结束章节!")
+                    return
+
+                self.modify_chapters(filepath, start_chapter, end_chapter, increment)
+
+            elif mode_choice == '2':
+                # 按章节名修改
+                start_name = input("✏️ 请输入开始章节名称: ").strip()
+                if not start_name:
+                    print("❌ 开始章节名称不能为空")
+                    return
+
+                end_name = input("✏️ 请输入结束章节名称: ").strip()
+                if not end_name:
+                    print("❌ 结束章节名称不能为空")
+                    return
+
+                increment = int(input("✏️ 请输入章节修改值(+/-数字): "))
+
+                self.modify_chapters_by_name(filepath, start_name, end_name, increment)
+
+            else:
+                print("❌ 无效的选择")
 
         except ValueError as e:
             print(f"❌ 请输入有效的数字! {str(e)}")
-
+        except KeyboardInterrupt:
+            print("\n✅ 已取消操作")
 
 class ExtractScriptGenerator:
     """章节提取脚本生成器"""

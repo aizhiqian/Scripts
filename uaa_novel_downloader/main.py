@@ -5,6 +5,36 @@ import argparse
 import sys
 import os
 from pathlib import Path
+
+# 处理PyInstaller打包后的路径问题
+def get_resource_path(relative_path):
+    """获取资源文件的绝对路径，兼容PyInstaller打包"""
+    try:
+        # PyInstaller创建临时文件夹，并将路径存储在_MEIPASS中
+        base_path = sys._MEIPASS
+    except Exception:
+        base_path = os.path.abspath(".")
+    return os.path.join(base_path, relative_path)
+
+# 设置工作目录（确保配置文件在正确位置）
+if getattr(sys, 'frozen', False):
+    # 如果是打包后的可执行文件
+    application_path = os.path.dirname(sys.executable)
+else:
+    # 如果是源码运行
+    application_path = os.path.dirname(os.path.abspath(__file__))
+
+# 切换到应用程序目录
+os.chdir(application_path)
+
+# 添加src目录到路径
+src_path = os.path.join(application_path, "src")
+if os.path.exists(src_path):
+    sys.path.insert(0, src_path)
+else:
+    # 如果src目录不存在，尝试从当前目录导入
+    sys.path.insert(0, application_path)
+
 from src.auth import AuthManager
 from src.downloader import NovelDownloader
 from src.utils import ChapterModifier, ExtractScriptGenerator
@@ -16,6 +46,21 @@ def setup_command(args):
     """初始化项目目录结构和配置"""
     setup_directories()
     print("✅ 项目初始化完成！请编辑config目录下的users.txt文件添加您的账号信息")
+    print("💡 首次登录时会自动下载配置ChromeDriver")
+
+def gui_command(args):
+    """启动GUI界面"""
+    try:
+        from gui_app import NovelDownloaderGUI
+        app = NovelDownloaderGUI()
+        app.run()
+    except ImportError as e:
+        print("❌ GUI界面启动失败，请确保已安装tkinter")
+        print(f"错误详情: {str(e)}")
+        sys.exit(1)
+    except Exception as e:
+        print(f"❌ GUI界面启动失败: {str(e)}")
+        sys.exit(1)
 
 def login_command(args):
     """登录并获取Cookie"""
@@ -99,9 +144,15 @@ def modify_command(args):
     """修改章节编号"""
     modifier = ChapterModifier()
 
-    if args.file and args.start and args.end is not None:
-        # 使用命令行参数
-        modifier.modify_chapters(args.file, args.start, args.end, args.increment)
+    if args.file:
+        if args.start_name and args.end_name and args.increment is not None:
+            # 使用章节名修改
+            modifier.modify_chapters_by_name(args.file, args.start_name, args.end_name, args.increment)
+        elif args.start and args.end is not None and args.increment is not None:
+            # 使用章节编号修改
+            modifier.modify_chapters(args.file, args.start, args.end, args.increment)
+        else:
+            print("❌ 请指定修改参数")
     else:
         # 交互式使用
         modifier.interactive_modify()
@@ -118,6 +169,9 @@ def main():
 
     # setup命令
     setup_parser = subparsers.add_parser('setup', help='初始化项目目录结构')
+
+    # gui命令
+    gui_parser = subparsers.add_parser('gui', help='启动GUI界面')
 
     # login命令
     login_parser = subparsers.add_parser('login', help='登录并获取Cookie')
@@ -140,22 +194,35 @@ def main():
     # modify命令
     modify_parser = subparsers.add_parser('modify', help='修改章节编号')
     modify_parser.add_argument('--file', help='文件路径')
-    modify_parser.add_argument('--start', type=int, help='开始章节')
-    modify_parser.add_argument('--end', type=int, help='结束章节')
+    modify_parser.add_argument('--start', type=int, help='开始章节编号')
+    modify_parser.add_argument('--end', type=int, help='结束章节编号')
+    modify_parser.add_argument('--start-name', help='开始章节名称')
+    modify_parser.add_argument('--end-name', help='结束章节名称')
     modify_parser.add_argument('--increment', type=int, default=1, help='增量值 (默认: 1)')
 
     # extract命令
-    extract_parser = subparsers.add_parser('extract', help='生成章节提取脚本')
+    extract_parser = subparsers.add_parser('extract', help='生成浏览器章节提取脚本')
 
     args = parser.parse_args()
 
     if not args.command:
-        parser.print_help()
+        # 如果没有提供命令，默认启动GUI
+        try:
+            from gui_app import NovelDownloaderGUI
+            app = NovelDownloaderGUI()
+            app.run()
+        except ImportError:
+            print("GUI模块未安装，显示帮助信息：")
+            parser.print_help()
+        except Exception as e:
+            print(f"启动GUI失败: {str(e)}")
+            parser.print_help()
         return
 
     # 执行对应的命令
     commands = {
         'setup': setup_command,
+        'gui': gui_command,
         'login': login_command,
         'download': download_command,
         'progress': progress_command,

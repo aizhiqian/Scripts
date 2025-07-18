@@ -70,7 +70,7 @@ class NovelDownloader:
                 for a in soup.select('div.info_box div.item a[href*="category"]')
             ])
 
-            description = soup.select_one('.brief_box .brief').text.strip()
+            description = soup.select_one('.brief_box .txt.ellipsis').text.strip()
 
             tags = ' '.join([
                 a.text.strip()
@@ -114,9 +114,9 @@ class NovelDownloader:
             self.logger.exception(f"获取小说信息失败: {str(e)}")
             raise Exception(f"获取小说信息失败: {str(e)}")
 
-    def download_chapter(self, url, chapter_title):
+    def download_chapter(self, url, chapter_num, chapter_title):
         """下载单个章节内容"""
-        self.logger.info(f"下载章节: {chapter_title}")
+        self.logger.info(f"下载章节【{chapter_num}】: {chapter_title}")
         try:
             soup = BeautifulSoup(self.get_response(url).content, 'html.parser')
             content = soup.select_one('div.article')
@@ -210,7 +210,7 @@ class NovelDownloader:
                             break
 
                         # 下载章节内容
-                        content = self.download_chapter(url, chapter_title)
+                        content = self.download_chapter(url, current_chapter, chapter_title)
                         if content:
                             f.write(f"\n{chapter_title}\n\n{content}\n\n")
                             print(f"✅ [{current_chapter}/{end_chapter}] {chapter_title}")

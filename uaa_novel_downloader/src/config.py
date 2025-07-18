@@ -7,23 +7,32 @@ class Config:
     """配置管理类"""
     # 基础URL和网站信息
     BASE_URL = "https://www.uaa001.com"
-    USER_AGENT = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/133.0.0.0 Safari/537.36'
+    USER_AGENT = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36'
+
+    # 处理PyInstaller打包后的路径
+    if getattr(sys, 'frozen', False):
+        # 如果是打包后的可执行文件，使用可执行文件所在目录
+        ROOT_DIR = Path(os.path.dirname(sys.executable))
+    else:
+        # 如果是源码运行，使用项目根目录
+        ROOT_DIR = Path(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
     # 目录配置
-    ROOT_DIR = Path(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
     CONFIG_DIR = ROOT_DIR / "config"
     DATA_DIR = ROOT_DIR / "data"
     LOGS_DIR = ROOT_DIR / "logs"
     OUTPUT_DIR = ROOT_DIR / "output"
 
+    # ChromeDriver管理配置
+    WEBDRIVER_CACHE_DIR = ROOT_DIR / ".wdm"
+
     # 文件配置
     COOKIE_FILE = DATA_DIR / "cookies.json"
     USERS_FILE = CONFIG_DIR / "users.txt"
     PROGRESS_FILE = DATA_DIR / "progress.json"
-    CHROMEDRIVER_PATH = ROOT_DIR / "chromedriver.exe"
 
     # 网络请求配置
-    RETRY_COUNT = 3
+    RETRY_COUNT = 1
     RETRY_DELAY = 5
     CHAPTER_DELAY = 5
 

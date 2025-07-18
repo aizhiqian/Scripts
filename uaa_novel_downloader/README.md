@@ -1,17 +1,19 @@
 # 📚 UAA小说下载器
 
-一个用于下载[UAA](https://uaadizhi.com/)网站小说的工具，支持批量章节下载、进度管理和断点续传功能。重构版本提供了更加模块化、稳定和易于使用的体验。
+一个用于下载[UAA](https://uaadizhi.com/)网站小说的工具，支持批量章节下载、进度管理和断点续传功能。重构版本提供了更加模块化、稳定和易于使用的体验，现已支持用户友好的GUI界面。
 
 ## ✨ 功能特点
 
+- **🖥️ 图形用户界面**：全新的GUI界面，操作简单直观（推荐使用）
 - **📱 用户友好的命令行界面**：提供了多种命令和参数选项
 - **🔐 身份验证管理**：自动处理登录和Cookie管理
 - **⏸️ 断点续传**：支持从上次下载的位置继续下载
 - **📊 进度管理**：记录和管理下载进度
-- **✏️ 章节修改**：支持修改已下载文件中的章节编号
+- **✏️ 章节修改**：支持按编号或章节名修改已下载文件中的章节编号
 - **🔄 自动重试**：网络请求失败时自动重试
 - **📝 日志记录**：详细的日志记录，便于排查问题
 - **🔧 高度可配置**：多种参数可调整以适应不同需求
+- **🚗 智能ChromeDriver管理**：自动下载、更新和管理ChromeDriver
 
 ## 📂 项目结构
 
@@ -33,8 +35,10 @@ uaa_novel_downloader/
 │   ├── progress.py        - 进度管理模块
 │   ├── logger.py          - 日志记录模块
 │   └── utils.py           - 工具辅助模块
+├── .wdm/                  - webdriver_manager缓存目录
+├── gui_app.py             - GUI主应用程序
+├── gui_tools.py           - GUI工具模块
 ├── main.py                - 主程序入口
-├── chromedriver.exe       - Chrome浏览器驱动
 └── README.md              - 项目说明文档
 ```
 
@@ -46,7 +50,9 @@ uaa_novel_downloader/
   - ✅ requests
   - ✅ beautifulsoup4
   - ✅ selenium
+  - ✅ webdriver-manager
   - ✅ argparse
+  - ✅ tkinter（Python内置，用于GUI界面）
 
 ## 🚀 快速开始
 
@@ -67,41 +73,50 @@ pip install -r requirements.txt
 
 ### 3. 设置环境
 
-确保已安装Chrome浏览器，并下载与浏览器版本匹配的[ChromeDriver](https://chromedriver.chromium.org/downloads)，放置在项目根目录。
+确保已安装Chrome浏览器。程序会自动下载与浏览器版本匹配的ChromeDriver到项目目录，无需手动下载。
 
-### 4. 初始化项目
+> 💡 **智能ChromeDriver管理**: 程序使用 webdriver_manager 自动下载和管理ChromeDriver，确保版本兼容性。
 
+### 4. 启动程序
+
+有两种方式启动程序：
+
+#### 方式一：直接运行（推荐）
 ```bash
-python main.py setup
+python main.py
 ```
 
-### 5. 配置账号
-
-编辑`config/users.txt`文件，添加您的账号信息，格式为：
-```
-编号. 邮箱 密码
-```
-
-示例：
-```
-1. example@mail.com password123
-```
-
-### 6. 登录获取Cookie
-
+#### 方式二：启动GUI界面
 ```bash
-python main.py login
+python main.py gui
 ```
 
-### 7. 开始下载小说
+### 5. 使用GUI界面
 
-```bash
-python main.py download
-```
-
-按照提示操作即可。
+1. **初始化项目**：在菜单中选择"文件" -> "初始化项目"
+2. **配置账号**：编辑`config/users.txt`文件，添加您的账号信息
+3. **登录**：在GUI中选择账号并点击登录（首次登录会自动下载ChromeDriver）
+4. **下载小说**：输入小说ID，设置参数，开始下载
 
 ## 📖 使用指南
+
+### 🖥️ GUI界面使用（推荐）
+
+GUI界面包含以下主要功能区域：
+
+- **📊 状态信息**：显示登录状态和Cookie有效期
+- **🔑 账号登录**：选择账号并登录获取Cookie
+- **📚 小说下载**：输入小说ID，设置下载范围，开始下载
+- **📊 进度管理**：查看、继续、清除下载进度
+- **🔧 实用工具**：章节编号修改器、脚本生成器等
+- **📋 日志输出**：实时显示操作日志
+
+#### GUI主要操作流程：
+1. 点击"文件" -> "初始化项目"（首次使用）
+2. 编辑config/users.txt添加账号信息
+3. 在登录区域选择账号，点击"登录"
+4. 在下载区域输入小说ID，点击"获取信息"
+5. 设置下载范围，点击"开始下载"
 
 ### 🔑 身份验证
 
@@ -157,8 +172,11 @@ python main.py progress --clear
 # 交互式使用
 python main.py modify
 
-# 命令行参数
+# 按编号修改
 python main.py modify --file "output/小说名.txt" --start 10 --end 20 --increment 1
+
+# 按章节名修改（推荐）
+python main.py modify --file "output/小说名.txt" --start-name "章节名" --end-name "章节名" --increment 5
 ```
 
 ### 📜 获取章节提取脚本
@@ -176,6 +194,12 @@ python main.py extract
 
 ```
 python main.py --help
+```
+
+### GUI命令
+
+```
+python main.py gui
 ```
 
 ### 登录参数
@@ -217,10 +241,12 @@ python main.py progress --help
 python main.py modify --help
 
 参数:
-  --file FILE         文件路径
-  --start START       开始章节
-  --end END           结束章节
-  --increment INCREMENT 增量值 (默认: 1)
+  --file FILE             文件路径
+  --start START           开始章节编号
+  --end END               结束章节编号
+  --start-name START_NAME 开始章节名称
+  --end-name END_NAME     结束章节名称
+  --increment INCREMENT   增量值 (默认: 1)
 ```
 
 </details>
@@ -231,7 +257,7 @@ python main.py modify --help
 
 | 参数 | 描述 | 默认值 |
 |------|------|--------|
-| `RETRY_COUNT` | 网络请求失败重试次数 | 3 |
+| `RETRY_COUNT` | 网络请求失败重试次数 | 1 |
 | `RETRY_DELAY` | 重试间隔时间(秒) | 5 |
 | `CHAPTER_DELAY` | 章节下载间隔时间(秒) | 5 |
 | `CHROME_OPTIONS` | Chrome浏览器选项 | 见源码 |
@@ -257,20 +283,61 @@ python main.py modify --help
 <details>
 <summary>👉 为什么ChromeDriver启动失败?</summary>
 
-请确认:
-1. Chrome浏览器已正确安装
-2. ChromeDriver版本与Chrome浏览器版本匹配
-3. ChromeDriver已放置在项目根目录
+程序使用 webdriver_manager 自动管理ChromeDriver，会自动下载到项目的 `.wdm` 目录。如果仍然失败，请确认:
+1. Chrome浏览器已正确安装且版本较新
+2. 网络连接正常（用于下载ChromeDriver）
+3. 系统防火墙或杀毒软件未阻止程序运行
+4. 检查项目目录是否有写入权限
+5. 尝试手动删除 `.wdm/` 目录后重新运行
+
+**自动下载优势：**
+- 自动匹配Chrome浏览器版本
+- 自动检查和更新ChromeDriver
+- 缓存机制避免重复下载
+- 统一存储在项目目录便于管理
+</details>
+
+<details>
+<summary>👉 GUI界面启动失败怎么办?</summary>
+
+可能的原因：
+- tkinter未正确安装（通常随Python一起安装）
+- Python版本过低，建议使用Python 3.6+
+- 系统缺少GUI支持（Linux服务器等）
+- 尝试使用命令行模式：`python main.py download`
+</details>
+
+<details>
+<summary>👉 ChromeDriver自动下载失败怎么办?</summary>
+
+如果自动下载失败，程序会提供以下备选方案：
+1. **检查网络连接**：确保能访问GitHub和Chrome官方下载地址
+2. **手动下载**：访问 [ChromeDriver官网](https://developer.chrome.com/docs/chromedriver/downloads) 下载对应版本
+3. **放置位置**：将下载的ChromeDriver放在项目的 `drivers/` 目录
+4. **系统安装**：将ChromeDriver添加到系统PATH环境变量
+5. **代理设置**：如果使用代理，确保Python能正常访问网络
+
+**手动下载步骤：**
+```bash
+# 创建drivers目录
+mkdir drivers
+
+# 下载ChromeDriver后放入drivers目录
+# Windows: drivers/chromedriver.exe
+# Linux/Mac: drivers/chromedriver
+```
 </details>
 
 ## 🆘 故障排除
 
 | 问题 | 解决方案 |
 |-----|---------|
-| **无法登录** | • 检查账号密码是否正确<br>• 确认Chrome和ChromeDriver版本匹配<br>• 检查网络连接 |
+| **无法登录** | • 检查账号密码是否正确<br>• 检查网络连接<br>• Chrome浏览器版本过旧或过新 |
 | **下载失败** | • 检查网络连接<br>• 查看日志文件了解详情<br>• Cookie可能已过期，尝试重新登录<br>• 尝试增加重试次数和延迟 |
-| **ChromeDriver问题** | • 确保下载的ChromeDriver版本与您的Chrome浏览器版本匹配<br>• 尝试下载最新版本的ChromeDriver |
+| **ChromeDriver问题** | • 确保Chrome浏览器已正确安装<br>• 检查网络连接（用于自动下载ChromeDriver）<br>• 手动删除 `.wdm/` 和 `drivers/` 目录后重试<br>• 检查项目目录写入权限<br>• 系统防火墙或杀毒软件未阻止程序运行 |
+| **GUI启动失败** | • 确认Python版本≥3.6<br>• 检查tkinter是否已安装<br>• 尝试使用命令行模式 |
 | **文件解析错误** | • 检查输出文件是否完整<br>• 查看日志文件了解详细错误信息 |
+| **自动下载ChromeDriver失败** | • 检查网络连接和防火墙设置<br>• 手动下载ChromeDriver到drivers目录<br>• 设置代理环境变量（如果需要）<br>• 确保项目目录有写入权限 |
 
 ## 🔍 API 参数参考
 
@@ -328,6 +395,20 @@ https://www.uaa001.com/api/novel/app/novel/search?author=&category=&finished=&ex
 - 4: 女女文
 </details>
 
+## 🎯 推荐使用方式
+
+### 新手用户
+1. 使用 `python main.py gui` 启动图形界面
+2. 按照界面提示完成初始化和配置
+3. 首次登录时程序会自动下载配置ChromeDriver
+4. 通过GUI进行所有操作
+
+### 高级用户
+1. 使用命令行模式进行批量操作
+2. 编写脚本自动化下载流程
+3. 根据需要调整配置参数
+4. 可以手动管理ChromeDriver版本
+
 ## 📜 许可证
 
 本项目仅供学习和研究使用，请勿用于任何商业用途。使用本工具下载的内容请在24小时内删除，并支持正版。
@@ -336,4 +417,6 @@ https://www.uaa001.com/api/novel/app/novel/search?author=&category=&finished=&ex
 
 <div align="center">
 <p>如果本工具对您有帮助，请考虑给项目点个⭐️Star</p>
+<p>🖥️ 推荐使用GUI界面获得最佳体验！</p>
+<p>🚗 新版本支持ChromeDriver自动管理，更加便捷！</p>
 </div>
