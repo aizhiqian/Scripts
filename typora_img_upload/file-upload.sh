@@ -7,7 +7,7 @@ if ! command -v jq &> /dev/null; then
 fi
 
 # API地址
-API_URL="https://api.ilingku.com/int/v1/image.360"
+API_URL="https://api.ilingku.com/int/v1/image.sohu"
 
 # 存储图片URL的数组
 urls=()

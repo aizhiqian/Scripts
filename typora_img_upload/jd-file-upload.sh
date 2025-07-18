@@ -7,7 +7,7 @@ if ! command -v jq &> /dev/null; then
 fi
 
 # API地址
-API_URL="https://api.ilingku.com/int/v1/image.sohu"
+API_URL="https://api.xinyew.cn/api/jdtc"
 
 # 存储图片URL的数组
 urls=()
@@ -15,18 +15,21 @@ urls=()
 # 遍历所有图片参数
 for image_path in "$@"; do
     # 使用curl上传图片
-    response=$(curl -s -X POST -d "url=$image_path" "$API_URL")
+    response=$(curl -s -X POST -F "file=@$image_path" "$API_URL")
 
     # 解析响应JSON
-    code=$(echo "$response" | jq -r '.code')
-    msg=$(echo "$response" | jq -r '.msg')
-    url=$(echo "$response" | jq -r '.url')
+    errno=$(echo "$response" | jq -r '.errno')
+    message=$(echo "$response" | jq -r '.message')
 
     # 检查上传结果
-    if [ "$code" != "200" ]; then
-        echo "Upload failed for $image_path: $msg" >&2
+    if [ "$errno" != "0" ]; then
+        echo "Upload failed for $image_path: $message" >&2
         exit 1
     fi
+
+    # 提取图片URL和文件名
+    url=$(echo "$response" | jq -r '.data.url')
+    fileName=$(echo "$response" | jq -r '.data.fileName')
 
     # 收集成功URL
     urls+=("$url")
